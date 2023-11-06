@@ -1,36 +1,88 @@
-class ItemValue:
-    """Item Value DataClass"""
+// Java program to solve fractional Knapsack Problem
 
-    def __init__(self, wt_, val_):
-        self.wt = wt_
-        self.val = val_
-        self.cost = val_ / wt_
+import java.lang.*;
+import java.util.Arrays;
+import java.util.Comparator;
 
-def fractionalKnapSack(wt, val, capacity):
-    """Function to get the maximum value"""
-    iVal = [ItemValue(wt[i], val[i]) for i in range(len(wt))]
+// Greedy approach
+public class FractionalKnapsack {
+	
+	// Function to get maximum value
+	private static double getMaxValue(ItemValue[] arr,
+									int capacity)
+	{
+		// Sorting items by profit/weight ratio;
+		Arrays.sort(arr, new Comparator<ItemValue>() {
+			@Override
+			public int compare(ItemValue item1,
+							ItemValue item2)
+			{
+				double cpr1 = new Double((double)item1.profit/ (double)item1.weight);
+				double cpr2 = new Double((double)item2.profit/ (double)item2.weight);
 
-    # Sorting items by cost (value-to-weight ratio) in descending order
-    iVal.sort(key=lambda x: x.cost, reverse=True)
+				if (cpr1 < cpr2)
+					return 1;
+				else
+					return -1;
+			}
+		});
 
-    totalValue = 0
-    for i in iVal:
-        curWt = i.wt
-        curVal = i.val
-        if capacity - curWt >= 0:
-            capacity -= curWt
-            totalValue += curVal
-        else:
-            fraction = capacity / curWt
-            totalValue += curVal * fraction
-            break
-    return totalValue
+		double totalValue = 0d;
 
-if __name__ == "__main__":
-    wt = [10, 40, 20, 30]
-    val = [60, 40, 100, 120]
-    capacity = 50
+		for (ItemValue i : arr) {
 
-    # Function call
-    maxValue = fractionalKnapSack(wt, val, capacity)
-    print("Maximum value in Knapsack =", maxValue)
+			int curWt = (int)i.weight;
+			int curVal = (int)i.profit;
+
+			if (capacity - curWt >= 0) {
+
+				// This weight can be picked whole
+				capacity = capacity - curWt;
+				totalValue += curVal;
+			}
+			else {
+
+				// Item cant be picked whole
+				double fraction
+					= ((double)capacity / (double)curWt);
+				totalValue += (curVal * fraction);
+				capacity
+					= (int)(capacity - (curWt * fraction));
+				break;
+			}
+		}
+
+		return totalValue;
+	}
+
+	// Item value class
+	static class ItemValue {
+
+		int profit, weight;
+
+		// Item value function
+		public ItemValue(int val, int wt)
+		{
+			this.weight = wt;
+			this.profit = val;
+		}
+	}
+
+	// Driver code
+	public static void main(String[] args)
+	{
+
+		ItemValue[] arr = { new ItemValue(60, 10),
+							new ItemValue(100, 20),
+							new ItemValue(120, 30) };
+
+		int capacity = 50;
+
+		double maxValue = getMaxValue(arr, capacity);
+
+		// Function call
+		System.out.println(maxValue);
+	}
+	
+}
+// output = 240.0
